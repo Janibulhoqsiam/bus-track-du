@@ -155,56 +155,6 @@ def track_bus(bus_id):
 
 
 
-@app.route("/webhook", methods=["GET"])
-def verify_webhook():
-    # Facebook sends a GET request to verify the webhook
-    # Retrieve the `hub.mode`, `hub.challenge`, and `hub.verify_token` parameters
-    mode = request.args.get("hub.mode")
-    challenge = request.args.get("hub.challenge")
-    verify_token = request.args.get("hub.verify_token")
-
-    # Your verify token (use a string to verify the webhook)
-    if verify_token == "janibul_mamibot_verify_token_420":
-        return challenge, 200  # Respond with the challenge to complete the verification
-    else:
-        return "Verification failed", 403
-
-
-@app.route("/webhook", methods=["POST"])
-def handle_messages():
-    data = request.get_json()
-    
-    # Facebook verifies the incoming message
-    for entry in data.get("entry", []):
-        for messaging_event in entry.get("messaging", []):
-            sender_id = messaging_event.get("sender", {}).get("id")  # Sender ID
-            message_text = messaging_event.get("message", {}).get("text")  # User's message
-
-            # Check if the user asked for bus location
-            if "bus" in message_text.lower():
-                # Extract bus number from the message
-                bus_id = re.search(r"bus (\d+)", message_text.lower())
-                if bus_id:
-                    bus_id = bus_id.group(1)
-                    return_data = get_bus_location(bus_id)
-                    send_message(sender_id, return_data)
-                else:
-                    send_message(sender_id, "Please specify the bus number (e.g., Bus 1, Bus 2, Bus 3).")
-            else:
-                send_message(sender_id, "Send 'bus 1', 'bus 2', or 'bus 3' to track the bus.")
-    
-    return "OK", 200
-
-
-
-
-
-
-
-
-
-
-
 def send_message(recipient_id, text):
     payload = {
         "recipient": {"id": recipient_id},
@@ -243,6 +193,64 @@ def get_bus_location(bus_id):
     google_maps_url = f"https://maps.google.com/maps?q={lat},{lon}"
     
     return f"The current location of Bus {bus_id}: {address}\n{google_maps_url}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/webhook", methods=["GET"])
+def verify_webhook():
+    # Facebook sends a GET request to verify the webhook
+    # Retrieve the `hub.mode`, `hub.challenge`, and `hub.verify_token` parameters
+    mode = request.args.get("hub.mode")
+    challenge = request.args.get("hub.challenge")
+    verify_token = request.args.get("hub.verify_token")
+
+    # Your verify token (use a string to verify the webhook)
+    if verify_token == "janibul_mamibot_verify_token_420":
+        return challenge, 200  # Respond with the challenge to complete the verification
+    else:
+        return "Verification failed", 403
+
+
+@app.route("/webhook", methods=["POST"])
+def handle_messages():
+    data = request.get_json()
+    
+    # Facebook verifies the incoming message
+    for entry in data.get("entry", []):
+        for messaging_event in entry.get("messaging", []):
+            sender_id = messaging_event.get("sender", {}).get("id")  # Sender ID
+            message_text = messaging_event.get("message", {}).get("text")  # User's message
+
+            # Check if the user asked for bus location
+            if "bus" in message_text.lower():
+                # Extract bus number from the message
+                bus_id = re.search(r"bus (\d+)", message_text.lower())
+                if bus_id:
+                    bus_id = bus_id.group(1)
+                    return_data = get_bus_location(bus_id)
+                    send_message(sender_id, return_data)
+                else:
+                    send_message(sender_id, "Please specify the bus number (e.g., Bus 1, Bus 2, Bus 3).")
+            else:
+                send_message(sender_id, "Send 'bus 1', 'bus 2', or 'bus 3' to track the bus live location.")
+    
+    return "OK", 200
+
 
 
 
