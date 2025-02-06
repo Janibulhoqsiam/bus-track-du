@@ -141,7 +141,10 @@ def track_bus(bus_id):
     # Return address, and Google Maps link
     data = {"address": address, "google_maps_link": google_maps_url}
     
-    return jsonify(data)
+    return Response(
+        json.dumps(data, ensure_ascii=False, indent=2),
+        mimetype='application/json; charset=utf-8'
+    )
 
 # if __name__ == "__main__":
 #     app.run(debug=True)
