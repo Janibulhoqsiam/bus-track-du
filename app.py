@@ -9,6 +9,9 @@ from flask import Flask, jsonify, Response
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False  # Ensure Unicode (e.g. Bangla) is not escaped
 
+
+
+
 # Replace with your actual credentials and URLs
 LOGIN_URL = "https://www.du.banglatracking.com/app_userssign_me_in"
 # Define the tracking URLs for the three different buses
@@ -146,8 +149,136 @@ def track_bus(bus_id):
         mimetype='application/json; charset=utf-8'
     )
 
-# if __name__ == "__main__":
-#     app.run(debug=True)
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/webhook", methods=["GET"])
+def verify_webhook():
+    # Facebook sends a GET request to verify the webhook
+    # Retrieve the `hub.mode`, `hub.challenge`, and `hub.verify_token` parameters
+    mode = request.args.get("hub.mode")
+    challenge = request.args.get("hub.challenge")
+    verify_token = request.args.get("hub.verify_token")
+
+    # Your verify token (use a string to verify the webhook)
+    if verify_token == "YOUR_VERIFY_TOKEN":
+        return challenge, 200  # Respond with the challenge to complete the verification
+    else:
+        return "Verification failed", 403
+
+
+@app.route("/webhook", methods=["POST"])
+def handle_messages():
+    data = request.get_json()
+    
+    # Facebook verifies the incoming message
+    for entry in data.get("entry", []):
+        for messaging_event in entry.get("messaging", []):
+            sender_id = messaging_event.get("sender", {}).get("id")  # Sender ID
+            message_text = messaging_event.get("message", {}).get("text")  # User's message
+
+            # Check if the user asked for bus location
+            if "bus" in message_text.lower():
+                # Extract bus number from the message
+                bus_id = re.search(r"bus (\d+)", message_text.lower())
+                if bus_id:
+                    bus_id = bus_id.group(1)
+                    return_data = get_bus_location(bus_id)
+                    send_message(sender_id, return_data)
+                else:
+                    send_message(sender_id, "Please specify the bus number (e.g., Bus 1, Bus 2, Bus 3).")
+            else:
+                send_message(sender_id, "Send 'bus 1', 'bus 2', or 'bus 3' to track the bus.")
+    
+    return "OK", 200
+
+
+
+
+
+
+
+
+
+
+
+    def send_message(recipient_id, text):
+    payload = {
+        "recipient": {"id": recipient_id},
+        "message": {"text": text}
+    }
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {YOUR_PAGE_ACCESS_TOKEN}"
+    }
+    
+    response = requests.post(
+        "https://graph.facebook.com/v14.0/me/messages",
+        json=payload,
+        headers=headers
+    )
+    
+    if response.status_code != 200:
+        print(f"Failed to send message: {response.text}")
+
+
+
+
+
+
+
+def get_bus_location(bus_id):
+    if bus_id not in TRACKING_URLS:
+        return "Invalid bus ID. Please provide a valid bus number."
+
+    tracking_url = TRACKING_URLS[bus_id]
+    lat, lon = get_bus_coordinates(tracking_url)
+    if lat is None or lon is None:
+        return "Could not fetch bus coordinates."
+
+    address = reverse_geocode(lat, lon)
+    google_maps_url = f"https://maps.google.com/maps?q={lat},{lon}"
+    
+    return f"The current location of Bus {bus_id}: {address}\n{google_maps_url}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/', methods=['GET'])
