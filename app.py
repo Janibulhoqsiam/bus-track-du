@@ -210,7 +210,7 @@ def handle_messages():
 
 
 
-    def send_message(recipient_id, text):
+def send_message(recipient_id, text):
     payload = {
         "recipient": {"id": recipient_id},
         "message": {"text": text}
@@ -248,26 +248,6 @@ def get_bus_location(bus_id):
     google_maps_url = f"https://maps.google.com/maps?q={lat},{lon}"
     
     return f"The current location of Bus {bus_id}: {address}\n{google_maps_url}"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
