@@ -4,7 +4,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
-from flask import Flask, jsonify, Response
+from flask import Flask, jsonify, request, Response
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False  # Ensure Unicode (e.g. Bangla) is not escaped
@@ -148,11 +148,6 @@ def track_bus(bus_id):
         json.dumps(data, ensure_ascii=False, indent=2),
         mimetype='application/json; charset=utf-8'
     )
-
-
-
-
-
 
 
 
