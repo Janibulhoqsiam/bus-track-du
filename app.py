@@ -135,15 +135,21 @@ def track_bus(bus_id):
 
     address = reverse_geocode(lat, lon)
 
-    # Return only the address part as pretty printed JSON with Unicode
-    data = {"address": address}
-    return Response(
-        json.dumps(data, ensure_ascii=False, indent=2),
-        mimetype='application/json; charset=utf-8'
-    )
+   
+    google_maps_url = f"https://maps.google.com/maps?q={lat},{lon}"
+
+    # Return address, and Google Maps link
+    data = {"address": address, "google_maps_link": google_maps_url}
+    
+    return jsonify(data)
 
 # if __name__ == "__main__":
 #     app.run(debug=True)
+
+
+@app.route('/', methods=['GET'])
+def working():
+    return "Working", 200    
 
 
 if __name__ == "__main__":
