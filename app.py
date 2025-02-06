@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False  # Ensure Unicode (e.g. Bangla) is not escaped
 
 
-
+access_token="EAB4rQwZAdmgUBOZBfngIHoGXVR7IlokYqK0CxdTj7ZBml3PmBZAhp9xCzAsOFA8L6xw7lhWcrOZBzkdA1MEwOdqJqUfmTsC9SvBlf86bRhxUisroZA4NrzRs1QWU2TjRMviEbEvQoqCegRAyBlUAKHwqNvHUSMuI7Xh9qjAHeEG4ewXwlTwAn9EzZBxcSiKtLkDFfRjbODKpM5tx0tlfgZDZD"
 
 # Replace with your actual credentials and URLs
 LOGIN_URL = "https://www.du.banglatracking.com/app_userssign_me_in"
@@ -169,7 +169,7 @@ def verify_webhook():
     verify_token = request.args.get("hub.verify_token")
 
     # Your verify token (use a string to verify the webhook)
-    if verify_token == "YOUR_VERIFY_TOKEN":
+    if verify_token == "janibul_mamibot_verify_token_420":
         return challenge, 200  # Respond with the challenge to complete the verification
     else:
         return "Verification failed", 403
@@ -217,7 +217,7 @@ def handle_messages():
     }
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {YOUR_PAGE_ACCESS_TOKEN}"
+        "Authorization": f"Bearer {access_token}"
     }
     
     response = requests.post(
