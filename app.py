@@ -1,9 +1,10 @@
 import os
 import re
 import json
+import requests
 from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
-from flask import Flask, jsonify, Response, requests
+from flask import Flask, jsonify, Response
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False  # Ensure Unicode (e.g. Bangla) is not escaped
